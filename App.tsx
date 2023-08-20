@@ -27,32 +27,83 @@ const images = [
   "https://images.unsplash.com/photo-1548600916-dc8492f8e845?w=800&q=80",
 ];
 
-const RenderItem = memo(({ item, index }: { item: string; index: number }) => {
-  return (
-    <View style={{ width, justifyContent: "center", alignItems: "center" }}>
-      <Image
-        source={{ uri: item }}
-        style={{
-          width: ITEM_WIDTH,
-          height: ITEM_HEIGHT,
-          resizeMode: "cover",
-        }}
-      />
-    </View>
-  );
-});
+const RenderItem = memo(
+  ({
+    item,
+    index,
+    scrollX,
+  }: {
+    item: string;
+    index: number;
+    scrollX: Animated.Value;
+  }) => {
+    const inputRange = [
+      (index - 1) * width,
+      index * width,
+      (index + 1) * width,
+    ];
+
+    const translateX = scrollX.interpolate({
+      inputRange,
+      outputRange: [-width * 0.7, 0, width * 0.7],
+    });
+    return (
+      <View style={{ width, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{
+            borderRadius: 18,
+            backgroundColor: "white",
+            padding: 12,
+            elevation: 10,
+          }}
+        >
+          <View
+            style={{
+              width: ITEM_WIDTH,
+              height: ITEM_HEIGHT,
+              overflow: "hidden",
+              alignItems: "center",
+              borderRadius: 12,
+            }}
+          >
+            <Animated.Image
+              source={{ uri: item }}
+              style={{
+                width: ITEM_WIDTH * 1.4,
+                height: ITEM_HEIGHT,
+                resizeMode: "cover",
+                transform: [
+                  {
+                    translateX,
+                  },
+                ],
+              }}
+            />
+          </View>
+        </View>
+      </View>
+    );
+  }
+);
 
 export default function App() {
+  const scrollX = React.useRef(new Animated.Value(0)).current;
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <FlatList
+      <Animated.FlatList
         data={images}
         keyExtractor={(_, index) => index.toString()}
         scrollEventThrottle={16}
         horizontal
+        snapToInterval={width}
+        decelerationRate={0.985}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: true }
+        )}
         renderItem={({ item, index }) => (
-          <RenderItem item={item} index={index} />
+          <RenderItem item={item} index={index} scrollX={scrollX} />
         )}
       />
     </View>
