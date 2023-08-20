@@ -1,13 +1,5 @@
 import React, { memo } from "react";
-import {
-  Animated,
-  Dimensions,
-  Image,
-  FlatList,
-  Text,
-  View,
-  StyleSheet,
-} from "react-native";
+import { Animated, Dimensions, View, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
 const { width, height } = Dimensions.get("screen");
@@ -94,10 +86,13 @@ export default function App() {
       <Animated.FlatList
         data={images}
         keyExtractor={(_, index) => index.toString()}
+        showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
         horizontal
         snapToInterval={width}
-        decelerationRate={0.985}
+        decelerationRate={0.9}
+        bounces={false}
+        renderToHardwareTextureAndroid
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: true }
